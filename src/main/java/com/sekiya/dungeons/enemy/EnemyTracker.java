@@ -84,4 +84,11 @@ public class EnemyTracker {
         Set<String> enemies = roomEnemies.get(roomId);
         return enemies != null ? new HashSet<>(enemies) : new HashSet<>();
     }
+    
+    /**
+     * Gets all room IDs that have enemies
+     */
+    public Set<String> getAllRoomIds() {
+        return new HashSet<>(roomEnemies.keySet());
+    }
 }

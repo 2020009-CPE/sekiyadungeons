@@ -3,6 +3,7 @@ package com.sekiya.dungeons.enemy;
 import com.sekiya.dungeons.util.Location;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Manages enemy spawning in dungeons
@@ -52,6 +53,13 @@ public class EnemyManager {
     }
     
     /**
+     * Gets the enemy tracker
+     */
+    public EnemyTracker getTracker() {
+        return tracker;
+    }
+    
+    /**
      * Handles enemy death
      */
     public void onEnemyDeath(String entityUuid) {
@@ -61,13 +69,6 @@ public class EnemyManager {
         if (roomId != null && tracker.isRoomCleared(roomId)) {
             System.out.println("Room " + roomId + " has been cleared!");
         }
-    }
-    
-    /**
-     * Gets the enemy tracker
-     */
-    public EnemyTracker getTracker() {
-        return tracker;
     }
     
     /**
@@ -94,8 +95,11 @@ public class EnemyManager {
      * Clears all enemies in the dungeon
      */
     public void clearAll() {
+        // Get all room IDs before clearing
+        Set<String> roomIds = tracker.getAllRoomIds();
+        
         // Despawn all tracked enemies
-        for (String roomId : new ArrayList<>(tracker.roomEnemies.keySet())) {
+        for (String roomId : roomIds) {
             clearRoomEnemies(roomId);
         }
     }
