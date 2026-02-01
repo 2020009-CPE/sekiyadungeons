@@ -1,9 +1,8 @@
 package com.sekiya.dungeons;
 
-// Note: These imports require the Hytale API JAR to be in the libs/ folder
-// Uncomment when the Hytale API is available:
-// import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-// import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.plugin.JavaPlugin;
+import com.hypixel.hytale.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.config.Config;
 
 import com.sekiya.dungeons.api.DungeonAPI;
 import com.sekiya.dungeons.command.DungeonCommand;
@@ -23,31 +22,20 @@ import com.sekiya.dungeons.hud.HUDManager;
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Main plugin class for SekiyaDungeons
  * 
- * IMPORTANT: This class is designed to work with the Hytale Plugin API
- * Package: com.hypixel.hytale.server.core.plugin.JavaPlugin
- * 
- * To use the actual Hytale API:
- * 1. Add HytaleServer.jar or Hytale API JAR to libs/ folder
- * 2. Uncomment the extends clause below
- * 3. Uncomment the constructor
- * 4. Replace method signatures to match Hytale's lifecycle
- * 
- * Current structure follows the template from:
- * https://github.com/realBritakee/hytale-template-plugin
+ * Implements the Hytale Plugin API with proper lifecycle methods
+ * and configuration management using BuilderCodec system.
  * 
  * @author Sekiya
  * @version 1.0.0
  */
-public class SekiyaDungeons /* extends JavaPlugin */ {
+public class SekiyaDungeons extends JavaPlugin {
     
     private static SekiyaDungeons instance;
-    private Logger logger;
+    private Config<com.sekiya.dungeons.config.PluginConfig> config;
     
     // Managers
     private ConfigManager configManager;
@@ -76,24 +64,15 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
     
     /**
      * Constructor for Hytale Plugin API
-     * Uncomment this when Hytale API is available
      */
-    /*
     public SekiyaDungeons(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
-        this.logger = getLogger();
-        logger.at(Level.INFO).log("SekiyaDungeons plugin loaded!");
-    }
-    */
-    
-    /**
-     * Temporary constructor for standalone testing
-     * Remove this when using actual Hytale API
-     */
-    public SekiyaDungeons() {
-        instance = this;
-        this.logger = Logger.getLogger("SekiyaDungeons");
+        
+        // Register config with Hytale's codec system
+        this.config = this.withConfig("SekiyaDungeons", com.sekiya.dungeons.config.PluginConfig.CODEC);
+        
+        getLogger().info("SekiyaDungeons initializing...");
     }
     
     /**
@@ -104,25 +83,18 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
     }
     
     /**
-     * Get logger
+     * Get plugin configuration
      */
-    public Logger getLogger() {
-        return logger;
+    public com.sekiya.dungeons.config.PluginConfig getPluginConfig() {
+        return config.get();
     }
     
     /**
-     * Called when plugin is set up (Hytale lifecycle)
-     * In Hytale API, this is setup() method
-     * 
-     * Use this for:
-     * - Loading configuration
-     * - Registering event listeners  
-     * - Registering commands
-     * - Starting services
+     * Called when plugin is enabled (Hytale lifecycle)
      */
-    // @Override // Uncomment when extending JavaPlugin
-    protected void setup() {
-        logger.log(Level.INFO, "SekiyaDungeons setup starting...");
+    @Override
+    public void onEnable() {
+        getLogger().info("SekiyaDungeons setup starting...");
         
         // Initialize data folder
         Path dataFolder = getDataFolder();
@@ -142,30 +114,20 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
         // Load configurations
         loadConfigurations();
         
-        logger.log(Level.INFO, "SekiyaDungeons setup complete!");
-    }
-    
-    /**
-     * Called when plugin is enabled (Hytale lifecycle)
-     * In Hytale API, this is start() method
-     */
-    // @Override // Uncomment when extending JavaPlugin
-    protected void start() {
-        logger.log(Level.INFO, "╔═══════════════════════════════════════╗");
-        logger.log(Level.INFO, "║   SekiyaDungeons v1.0.0               ║");
-        logger.log(Level.INFO, "║   Dungeon system active!              ║");
-        logger.log(Level.INFO, "╚═══════════════════════════════════════╝");
-        logger.log(Level.INFO, "Loaded " + configManager.getAllDungeonTemplates().size() + " dungeon templates");
-        logger.log(Level.INFO, "Features: Party System, Auto-Generation, Wand Tool, HUD");
+        getLogger().info("╔═══════════════════════════════════════╗");
+        getLogger().info("║   SekiyaDungeons v1.0.0               ║");
+        getLogger().info("║   Dungeon system active!              ║");
+        getLogger().info("╚═══════════════════════════════════════╝");
+        getLogger().info("Loaded " + configManager.getAllDungeonTemplates().size() + " dungeon templates");
+        getLogger().info("Features: Party System, Auto-Generation, Wand Tool, HUD");
     }
     
     /**
      * Called when plugin is disabled (Hytale lifecycle)
-     * In Hytale API, this is shutdown() method
      */
-    // @Override // Uncomment when extending JavaPlugin
-    public void shutdown() {
-        logger.log(Level.INFO, "SekiyaDungeons shutting down...");
+    @Override
+    public void onDisable() {
+        getLogger().info("SekiyaDungeons shutting down...");
         
         // Close all active instances
         if (dungeonManager != null) {
@@ -179,27 +141,14 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
             configManager.savePluginConfig();
         }
         
-        logger.log(Level.INFO, "SekiyaDungeons disabled");
-    }
-    
-    /**
-     * Temporary methods for standalone testing
-     * Remove these when using actual Hytale API
-     */
-    public void onEnable() {
-        setup();
-        start();
-    }
-    
-    public void onDisable() {
-        shutdown();
+        getLogger().info("SekiyaDungeons disabled");
     }
     
     /**
      * Initializes all managers
      */
     private void initializeManagers(Path dataFolder) {
-        logger.log(Level.INFO, "Initializing managers...");
+        getLogger().info("Initializing managers...");
         this.configManager = new ConfigManager(dataFolder);
         this.dungeonManager = new DungeonManager(configManager);
         this.portalManager = new PortalManager();
@@ -209,17 +158,14 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
         this.hudManager = new HUDManager();
         this.resetter = new DungeonResetter();
         this.completionHandler = new CompletionHandler(dungeonManager, portalManager, resetter);
-        logger.log(Level.INFO, "Managers initialized");
+        getLogger().info("Managers initialized");
     }
     
     /**
      * Registers event listeners
-     * 
-     * When Hytale API is available, use proper event registration:
-     * eventManager.registerListener(listener);
      */
     private void registerListeners() {
-        logger.log(Level.INFO, "Registering event listeners...");
+        getLogger().info("Registering event listeners...");
         this.portalInteractListener = new PortalInteractListener(portalManager, shardManager, dungeonManager);
         this.entityDeathListener = new EntityDeathListener(dungeonManager, completionHandler);
         this.playerMoveListener = new PlayerMoveListener(dungeonManager);
@@ -232,26 +178,22 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
         // eventManager.registerListener(entityDeathListener);
         // etc.
         
-        logger.log(Level.INFO, "Event listeners registered");
+        getLogger().info("Event listeners registered");
     }
     
     /**
-     * Registers commands
-     * 
-     * When Hytale API is available, use proper command registration:
-     * commandManager.registerCommand("dungeon", dungeonCommand);
+     * Registers commands using Hytale's command registry
      */
     private void registerCommands() {
-        logger.log(Level.INFO, "Registering commands...");
+        getLogger().info("Registering commands...");
         this.dungeonCommand = new DungeonCommand(configManager, dungeonManager, portalManager, shardManager);
         this.partyCommand = new PartyCommand(partyManager);
         
-        // TODO: When Hytale API is available, register these properly
-        // Example from actual API:
-        // commandManager.registerCommand("dungeon", dungeonCommand);
-        // commandManager.registerCommand("party", partyCommand);
+        // Register commands using Hytale's command registry
+        this.getCommandRegistry().registerCommand(dungeonCommand);
+        this.getCommandRegistry().registerCommand(partyCommand);
         
-        logger.log(Level.INFO, "Commands registered: /dungeon, /party");
+        getLogger().info("Commands registered: /dungeon, /party");
     }
     
     /**
@@ -259,14 +201,14 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
      */
     private void initializeAPI() {
         this.api = new DungeonAPI(dungeonManager, configManager);
-        logger.log(Level.INFO, "Public API initialized");
+        getLogger().info("Public API initialized");
     }
     
     /**
      * Loads all configurations and sets up dungeons
      */
     private void loadConfigurations() {
-        logger.log(Level.INFO, "Loading configurations...");
+        getLogger().info("Loading configurations...");
         configManager.reload();
         
         // Register portals for all dungeons
@@ -281,20 +223,14 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
             }
         }
         
-        logger.log(Level.INFO, "Configurations loaded");
+        getLogger().info("Configurations loaded");
     }
     
     /**
      * Gets the data folder for the plugin
-     * 
-     * When using actual Hytale API, this would be:
-     * return getPluginDataFolder(); // or similar method provided by JavaPlugin
      */
     private Path getDataFolder() {
-        // TODO: When Hytale API is available, use:
-        // return getPluginDataFolder();
-        
-        // Temporary placeholder for testing
+        // Use the plugin's data directory
         return Paths.get("plugins", "SekiyaDungeons");
     }
     
@@ -362,31 +298,5 @@ public class SekiyaDungeons /* extends JavaPlugin */ {
      */
     public HUDManager getHUDManager() {
         return hudManager;
-    }
-    
-    /**
-     * Main method for standalone testing
-     * Remove this when deploying as actual Hytale plugin
-     */
-    public static void main(String[] args) {
-        System.out.println("=== SekiyaDungeons Standalone Test ===\n");
-        
-        SekiyaDungeons plugin = new SekiyaDungeons();
-        plugin.onEnable();
-        
-        System.out.println("\n--- Plugin is running ---");
-        System.out.println("In actual Hytale server, the plugin would run until server shutdown");
-        System.out.println("Press Ctrl+C to stop (or wait for automatic shutdown)\n");
-        
-        // Simulate runtime
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        
-        plugin.onDisable();
-        
-        System.out.println("\n=== Test Complete ===");
     }
 }

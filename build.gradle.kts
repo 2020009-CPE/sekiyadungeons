@@ -14,6 +14,9 @@ dependencies {
     // Hytale API - Using provided scope as it will be available at runtime
     compileOnly(fileTree("libs") { include("*.jar") })
     
+    // javax.annotation for @Nonnull
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    
     // JSON processing
     implementation("com.google.code.gson:gson:2.10.1")
 }
