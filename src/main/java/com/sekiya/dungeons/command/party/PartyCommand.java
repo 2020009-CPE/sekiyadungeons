@@ -1,20 +1,28 @@
 package com.sekiya.dungeons.command.party;
 
+import com.hypixel.hytale.server.command.CommandBase;
+import com.hypixel.hytale.server.command.CommandContext;
+import com.hypixel.hytale.server.entity.Player;
+import com.hypixel.hytale.server.util.Message;
+
 import com.sekiya.dungeons.party.Party;
 import com.sekiya.dungeons.party.PartyManager;
 import com.sekiya.dungeons.util.MessageUtil;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Main party command handler
+ * Main party command handler extending Hytale's CommandBase
  */
-public class PartyCommand {
+public class PartyCommand extends CommandBase {
     private final PartyManager partyManager;
     private final Map<String, SubPartyCommand> subCommands;
     
     public PartyCommand(PartyManager partyManager) {
+        super("party", "Party management command", false); // false = doesn't require OP
+        
         this.partyManager = partyManager;
         this.subCommands = new HashMap<>();
         
@@ -33,43 +41,52 @@ public class PartyCommand {
         subCommands.put(subCommand.getName().toLowerCase(), subCommand);
     }
     
-    public boolean onCommand(Object sender, String[] args) {
-        if (args.length == 0) {
-            sendHelp(sender);
-            return true;
+    @Override
+    protected void executeSync(@Nonnull CommandContext ctx) {
+        if (!(ctx.getSender() instanceof Player)) {
+            ctx.getSender().sendMessage(Message.raw("&cThis command can only be used by players!"));
+            return;
         }
         
-        String subCommandName = args[0].toLowerCase();
-        SubPartyCommand subCommand = subCommands.get(subCommandName);
+        Player player = ctx.senderAs(Player.class);
+        String[] args = ctx.getArgs();
         
-        if (subCommand == null) {
-            MessageUtil.sendMessage(sender, "&cUnknown subcommand: " + subCommandName);
-            sendHelp(sender);
-            return true;
-        }
-        
-        // Execute subcommand
-        String[] subArgs = new String[args.length - 1];
-        System.arraycopy(args, 1, subArgs, 0, subArgs.length);
-        
-        if (!subCommand.execute(sender, subArgs)) {
-            MessageUtil.sendMessage(sender, "&cUsage: /party " + subCommand.getUsage());
-        }
-        
-        return true;
+        player.getWorld().execute(() -> {
+            if (args.length == 0) {
+                sendHelp(player);
+                return;
+            }
+            
+            String subCommandName = args[0].toLowerCase();
+            SubPartyCommand subCommand = subCommands.get(subCommandName);
+            
+            if (subCommand == null) {
+                player.sendMessage(Message.raw("&cUnknown subcommand: " + subCommandName));
+                sendHelp(player);
+                return;
+            }
+            
+            // Execute subcommand
+            String[] subArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, subArgs, 0, subArgs.length);
+            
+            if (!subCommand.execute(player, subArgs)) {
+                player.sendMessage(Message.raw("&cUsage: /party " + subCommand.getUsage()));
+            }
+        });
     }
     
-    private void sendHelp(Object sender) {
-        MessageUtil.sendMessage(sender, "&8&m----------------------------");
-        MessageUtil.sendMessage(sender, "&6&lParty Commands");
-        MessageUtil.sendMessage(sender, "&8&m----------------------------");
+    private void sendHelp(Player player) {
+        player.sendMessage(Message.raw("&8&m----------------------------"));
+        player.sendMessage(Message.raw("&6&lParty Commands"));
+        player.sendMessage(Message.raw("&8&m----------------------------"));
         
         for (SubPartyCommand cmd : subCommands.values()) {
-            MessageUtil.sendMessage(sender, 
-                String.format("&e/party %s &7- &f%s", cmd.getUsage(), cmd.getDescription()));
+            player.sendMessage(Message.raw(
+                String.format("&e/party %s &7- &f%s", cmd.getUsage(), cmd.getDescription())));
         }
         
-        MessageUtil.sendMessage(sender, "&8&m----------------------------");
+        player.sendMessage(Message.raw("&8&m----------------------------"));
     }
 }
 
@@ -80,7 +97,7 @@ interface SubPartyCommand {
     String getName();
     String getUsage();
     String getDescription();
-    boolean execute(Object sender, String[] args);
+    boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args);
 }
 
 /**
@@ -103,24 +120,19 @@ class CreatePartyCommand implements SubPartyCommand {
     public String getDescription() { return "Create a new party"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
-        String playerName = getPlayerName(sender);
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
+        String playerName = player.getName();
         
         Party party = partyManager.createParty(playerName);
         if (party == null) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cYou are already in a party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cYou are already in a party!")));
             return true;
         }
         
-        MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&aParty created! You are the leader."));
-        MessageUtil.sendMessage(sender, "&7Use /party invite <player> to invite members.");
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&aParty created! You are the leader.")));
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&7Use /party invite <player> to invite members."));
         
         return true;
-    }
-    
-    private String getPlayerName(Object sender) {
-        // Placeholder
-        return "Player";
     }
 }
 
@@ -144,37 +156,34 @@ class InvitePartyCommand implements SubPartyCommand {
     public String getDescription() { return "Invite a player to your party"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
         if (args.length < 1) {
             return false;
         }
         
-        String playerName = getPlayerName(sender);
+        String playerName = player.getName();
         String targetPlayer = args[0];
         
         Party party = partyManager.getPlayerParty(playerName);
         if (party == null) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cYou are not in a party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cYou are not in a party!")));
             return true;
         }
         
         if (!party.isLeader(playerName)) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cOnly the party leader can invite players!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cOnly the party leader can invite players!")));
             return true;
         }
         
         if (partyManager.inviteToParty(party.getPartyId(), targetPlayer)) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&aInvited " + targetPlayer + " to the party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&aInvited " + targetPlayer + " to the party!")));
         } else {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cFailed to invite player!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cFailed to invite player!")));
         }
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }
 
 /**
@@ -197,33 +206,30 @@ class JoinPartyCommand implements SubPartyCommand {
     public String getDescription() { return "Join a party you've been invited to"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
         if (args.length < 1) {
             return false;
         }
         
-        String playerName = getPlayerName(sender);
+        String playerName = player.getName();
         String leaderName = args[0];
         
         // Find party by leader name
         Party party = partyManager.getPlayerParty(leaderName);
         if (party == null) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cThat player doesn't have a party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cThat player doesn't have a party!")));
             return true;
         }
         
         if (partyManager.joinParty(playerName, party.getPartyId())) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&aYou joined the party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&aYou joined the party!")));
         } else {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cFailed to join party! Do you have an active invitation?"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cFailed to join party! Do you have an active invitation?")));
         }
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }
 
 /**
@@ -246,21 +252,18 @@ class LeavePartyCommand implements SubPartyCommand {
     public String getDescription() { return "Leave your current party"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
-        String playerName = getPlayerName(sender);
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
+        String playerName = player.getName();
         
         if (partyManager.leaveParty(playerName)) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&aYou left the party."));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&aYou left the party.")));
         } else {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cYou are not in a party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cYou are not in a party!")));
         }
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }
 
 /**
@@ -283,26 +286,23 @@ class KickPartyCommand implements SubPartyCommand {
     public String getDescription() { return "Kick a player from your party (leader only)"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
         if (args.length < 1) {
             return false;
         }
         
-        String playerName = getPlayerName(sender);
+        String playerName = player.getName();
         String targetPlayer = args[0];
         
         if (partyManager.kickFromParty(playerName, targetPlayer)) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&aKicked " + targetPlayer + " from the party."));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&aKicked " + targetPlayer + " from the party.")));
         } else {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cFailed to kick player!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cFailed to kick player!")));
         }
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }
 
 /**
@@ -325,32 +325,29 @@ class DisbandPartyCommand implements SubPartyCommand {
     public String getDescription() { return "Disband your party (leader only)"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
-        String playerName = getPlayerName(sender);
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
+        String playerName = player.getName();
         
         Party party = partyManager.getPlayerParty(playerName);
         if (party == null) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cYou are not in a party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cYou are not in a party!")));
             return true;
         }
         
         if (!party.isLeader(playerName)) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cOnly the party leader can disband!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cOnly the party leader can disband!")));
             return true;
         }
         
         if (partyManager.disbandParty(party.getPartyId())) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&aParty disbanded."));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&aParty disbanded.")));
         } else {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cFailed to disband party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cFailed to disband party!")));
         }
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }
 
 /**
@@ -373,35 +370,32 @@ class InfoPartyCommand implements SubPartyCommand {
     public String getDescription() { return "Show your party information"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
-        String playerName = getPlayerName(sender);
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
+        String playerName = player.getName();
         
         Party party = partyManager.getPlayerParty(playerName);
         if (party == null) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cYou are not in a party!"));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cYou are not in a party!")));
             return true;
         }
         
-        MessageUtil.sendMessage(sender, "&8&m-----------------------");
-        MessageUtil.sendMessage(sender, "&6&lParty Info");
-        MessageUtil.sendMessage(sender, "&8&m-----------------------");
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&6&lParty Info"));
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
         MessageUtil.sendMessage(sender, "&7Leader: &f" + party.getLeaderName());
         MessageUtil.sendMessage(sender, String.format("&7Members: &f%d/%d", party.getSize(), party.getMaxSize()));
-        MessageUtil.sendMessage(sender, "&7Party Members:");
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&7Party Members:"));
         
         for (String member : party.getMembers()) {
             String prefix = party.isLeader(member) ? "&6[Leader] " : "&7";
-            MessageUtil.sendMessage(sender, prefix + member);
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(prefix + member));
         }
         
-        MessageUtil.sendMessage(sender, "&8&m-----------------------");
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }
 
 /**
@@ -424,29 +418,26 @@ class ListPartyCommand implements SubPartyCommand {
     public String getDescription() { return "List all active parties"; }
     
     @Override
-    public boolean execute(Object sender, String[] args) {
+    public boolean execute(com.hypixel.hytale.server.entity.Player player, String[] args) {
         var parties = partyManager.getAllParties();
         
         if (parties.isEmpty()) {
-            MessageUtil.sendMessage(sender, MessageUtil.formatWithPrefix("&cNo active parties."));
+            player.sendMessage(com.hypixel.hytale.server.util.Message.raw(MessageUtil.formatWithPrefix("&cNo active parties.")));
             return true;
         }
         
-        MessageUtil.sendMessage(sender, "&8&m-----------------------");
-        MessageUtil.sendMessage(sender, "&6&lActive Parties");
-        MessageUtil.sendMessage(sender, "&8&m-----------------------");
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&6&lActive Parties"));
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
         
         for (Party party : parties) {
             MessageUtil.sendMessage(sender, String.format("&e%s's party &7- &f%d/%d members", 
                 party.getLeaderName(), party.getSize(), party.getMaxSize()));
         }
         
-        MessageUtil.sendMessage(sender, "&8&m-----------------------");
+        player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
         
         return true;
     }
     
-    private String getPlayerName(Object sender) {
-        return "Player";
-    }
 }

@@ -1,16 +1,46 @@
 package com.sekiya.dungeons.config;
 
+import com.hypixel.hytale.server.codec.BuilderCodec;
+import com.hypixel.hytale.server.codec.Codec;
+import com.hypixel.hytale.server.codec.KeyedCodec;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Main plugin configuration
+ * Main plugin configuration using Hytale's BuilderCodec system
  */
 public class PluginConfig {
+    
+    public static final BuilderCodec<PluginConfig> CODEC = 
+        BuilderCodec.builder(PluginConfig.class, PluginConfig::new)
+            .append(new KeyedCodec<Boolean>("debugMode", Codec.BOOL),
+                    (cfg, val, info) -> cfg.debugMode = val,
+                    (cfg, info) -> cfg.debugMode)
+            .add()
+            .append(new KeyedCodec<Integer>("maxConcurrentInstances", Codec.INT),
+                    (cfg, val, info) -> cfg.maxConcurrentInstances = val,
+                    (cfg, info) -> cfg.maxConcurrentInstances)
+            .add()
+            .append(new KeyedCodec<Boolean>("autoReset", Codec.BOOL),
+                    (cfg, val, info) -> cfg.autoReset = val,
+                    (cfg, info) -> cfg.autoReset)
+            .add()
+            .append(new KeyedCodec<Integer>("resetDelaySeconds", Codec.INT),
+                    (cfg, val, info) -> cfg.resetDelaySeconds = val,
+                    (cfg, info) -> cfg.resetDelaySeconds)
+            .add()
+            .append(new KeyedCodec<Integer>("completionCountdownSeconds", Codec.INT),
+                    (cfg, val, info) -> cfg.completionCountdownSeconds = val,
+                    (cfg, info) -> cfg.completionCountdownSeconds)
+            .add()
+            .build();
+
     private boolean debugMode;
     private int maxConcurrentInstances;
     private boolean autoReset;
     private int resetDelaySeconds;
+    private int completionCountdownSeconds;
     private Map<String, String> messages;
     
     public PluginConfig() {
@@ -18,6 +48,7 @@ public class PluginConfig {
         this.maxConcurrentInstances = 10;
         this.autoReset = true;
         this.resetDelaySeconds = 5;
+        this.completionCountdownSeconds = 30;
         this.messages = new HashMap<>();
         initializeDefaultMessages();
     }
@@ -48,6 +79,11 @@ public class PluginConfig {
     public int getResetDelaySeconds() { return resetDelaySeconds; }
     public void setResetDelaySeconds(int resetDelaySeconds) { 
         this.resetDelaySeconds = resetDelaySeconds; 
+    }
+    
+    public int getCompletionCountdownSeconds() { return completionCountdownSeconds; }
+    public void setCompletionCountdownSeconds(int completionCountdownSeconds) {
+        this.completionCountdownSeconds = completionCountdownSeconds;
     }
     
     public Map<String, String> getMessages() { return messages; }

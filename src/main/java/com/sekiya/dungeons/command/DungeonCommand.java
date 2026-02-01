@@ -46,62 +46,58 @@ public class DungeonCommand {
     }
     
     /**
-     * Executes the command
+     * Executes the command using Hytale's CommandContext
      */
-    public boolean onCommand(Object sender, String[] args) {
-        if (args.length == 0) {
-            sendHelp(sender);
-            return true;
+    @Override
+    protected void executeSync(@Nonnull CommandContext ctx) {
+        // Check if sender is a player (required for most dungeon commands)
+        if (!(ctx.getSender() instanceof Player)) {
+            ctx.getSender().sendMessage(Message.raw("&cThis command can only be used by players!"));
+            return;
         }
         
-        String subCommandName = args[0].toLowerCase();
-        SubCommand subCommand = subCommands.get(subCommandName);
+        Player player = ctx.senderAs(Player.class);
+        String[] args = ctx.getArgs();
         
-        if (subCommand == null) {
-            MessageUtil.sendMessage(sender, "&cUnknown subcommand: " + subCommandName);
-            sendHelp(sender);
-            return true;
-        }
-        
-        // Check permission
-        if (!hasPermission(sender, "sekiyadungeons.command." + subCommandName)) {
-            MessageUtil.sendMessage(sender, "&cYou don't have permission to use this command!");
-            return true;
-        }
-        
-        // Execute subcommand
-        String[] subArgs = new String[args.length - 1];
-        System.arraycopy(args, 1, subArgs, 0, subArgs.length);
-        
-        if (!subCommand.execute(sender, subArgs)) {
-            MessageUtil.sendMessage(sender, "&cUsage: /dungeon " + subCommand.getUsage());
-        }
-        
-        return true;
+        // Execute in world context for thread safety
+        player.getWorld().execute(() -> {
+            if (args.length == 0) {
+                sendHelp(player);
+                return;
+            }
+            
+            String subCommandName = args[0].toLowerCase();
+            SubCommand subCommand = subCommands.get(subCommandName);
+            
+            if (subCommand == null) {
+                player.sendMessage(Message.raw("&cUnknown subcommand: " + subCommandName));
+                sendHelp(player);
+                return;
+            }
+            
+            // Execute subcommand
+            String[] subArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, subArgs, 0, subArgs.length);
+            
+            if (!subCommand.execute(player, subArgs)) {
+                player.sendMessage(Message.raw("&cUsage: /dungeon " + subCommand.getUsage()));
+            }
+        });
     }
     
     /**
-     * Sends help message
+     * Sends help message to player
      */
-    private void sendHelp(Object sender) {
-        MessageUtil.sendMessage(sender, "&8&m----------------------------");
-        MessageUtil.sendMessage(sender, "&6&lSekiya Dungeons Commands");
-        MessageUtil.sendMessage(sender, "&8&m----------------------------");
+    private void sendHelp(Player player) {
+        player.sendMessage(Message.raw("&8&m----------------------------"));
+        player.sendMessage(Message.raw("&6&lSekiya Dungeons Commands"));
+        player.sendMessage(Message.raw("&8&m----------------------------"));
         
         for (SubCommand cmd : subCommands.values()) {
-            MessageUtil.sendMessage(sender, 
-                String.format("&e/dungeon %s &7- &f%s", cmd.getUsage(), cmd.getDescription()));
+            player.sendMessage(Message.raw(
+                String.format("&e/dungeon %s &7- &f%s", cmd.getUsage(), cmd.getDescription())));
         }
         
-        MessageUtil.sendMessage(sender, "&8&m----------------------------");
-    }
-    
-    /**
-     * Checks if sender has permission
-     * Placeholder for actual Hytale permission system
-     */
-    private boolean hasPermission(Object sender, String permission) {
-        // Placeholder: Use Hytale's permission API
-        return true; // For now, allow all
+        player.sendMessage(Message.raw("&8&m----------------------------"));
     }
 }
