@@ -31,6 +31,12 @@ public class GenerationConfig {
     private int minRewards = 2;
     private int maxRewards = 5;
     
+    // World generation
+    private boolean generateWorld = false;
+    private String theme = "STONE_CRYPT";
+    private boolean includeTreasureRooms = true;
+    private int treasureRoomChance = 30; // Percentage chance per dungeon
+    
     public GenerationConfig() {}
     
     public int getMinRooms() { return minRooms; }
@@ -86,4 +92,20 @@ public class GenerationConfig {
     
     public int getMaxRewards() { return maxRewards; }
     public void setMaxRewards(int maxRewards) { this.maxRewards = maxRewards; }
+    
+    public boolean isGenerateWorld() { return generateWorld; }
+    public void setGenerateWorld(boolean generateWorld) { this.generateWorld = generateWorld; }
+    
+    public String getTheme() { return theme; }
+    public void setTheme(String theme) { this.theme = theme; }
+    
+    public boolean isIncludeTreasureRooms() { return includeTreasureRooms; }
+    public void setIncludeTreasureRooms(boolean includeTreasureRooms) { 
+        this.includeTreasureRooms = includeTreasureRooms; 
+    }
+    
+    public int getTreasureRoomChance() { return treasureRoomChance; }
+    public void setTreasureRoomChance(int treasureRoomChance) { 
+        this.treasureRoomChance = treasureRoomChance; 
+    }
 }

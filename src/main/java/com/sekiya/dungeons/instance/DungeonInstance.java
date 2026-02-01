@@ -23,6 +23,7 @@ public class DungeonInstance {
     private BossRoom bossRoom;
     private long startTime;
     private long completionTime;
+    private int deathCount;
     
     public DungeonInstance(String instanceId, DungeonTemplate template) {
         this.instanceId = instanceId;
@@ -34,6 +35,7 @@ public class DungeonInstance {
         this.state = InstanceState.WAITING;
         this.startTime = 0;
         this.completionTime = 0;
+        this.deathCount = 0;
         
         // Initialize rooms
         if (template.getRooms() != null) {
@@ -150,6 +152,14 @@ public class DungeonInstance {
     
     public Location getExitPoint() {
         return template.getExitPoint();
+    }
+    
+    public int getDeathCount() {
+        return deathCount;
+    }
+    
+    public void incrementDeathCount() {
+        this.deathCount++;
     }
     
     @Override

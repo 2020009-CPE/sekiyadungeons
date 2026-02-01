@@ -129,4 +129,26 @@ public class RoomManager {
         }
         return null;
     }
+    
+    /**
+     * Gets the current room index (0-based)
+     */
+    public int getCurrentRoomIndex() {
+        List<DungeonRoom> roomList = getRooms();
+        for (int i = 0; i < roomList.size(); i++) {
+            if (!roomList.get(i).isCleared()) {
+                return i;
+            }
+        }
+        return roomList.size() - 1;
+    }
+    
+    /**
+     * Gets the number of completed rooms
+     */
+    public int getCompletedRoomCount() {
+        return (int) rooms.values().stream()
+            .filter(DungeonRoom::isCleared)
+            .count();
+    }
 }
