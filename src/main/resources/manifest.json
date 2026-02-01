@@ -1,0 +1,17 @@
+{
+  "Group": "com.sekiya",
+  "Name": "SekiyaDungeons",
+  "Main": "com.sekiya.dungeons.SekiyaDungeons",
+  "Version": "1.0.0",
+  "Description": "A comprehensive dungeon system with portals, shards, room progression, and boss encounters",
+  "Authors": [
+    {
+      "Name": "Sekiya",
+      "Url": "https://github.com/2020009-CPE"
+    }
+  ],
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {},
+  "DisabledByDefault": false
+}
