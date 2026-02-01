@@ -1,23 +1,38 @@
 package com.sekiya.dungeons.command;
 
+import com.hypixel.hytale.server.command.CommandBase;
+import com.hypixel.hytale.server.command.CommandContext;
+import com.hypixel.hytale.server.entity.Player;
+import com.hypixel.hytale.server.util.Message;
+
 import com.sekiya.dungeons.command.subcommands.*;
 import com.sekiya.dungeons.config.ConfigManager;
 import com.sekiya.dungeons.instance.DungeonManager;
 import com.sekiya.dungeons.portal.PortalManager;
 import com.sekiya.dungeons.shard.ShardManager;
-import com.sekiya.dungeons.util.MessageUtil;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Main dungeon command handler
+ * Main dungeon command handler extending Hytale's CommandBase
  */
-public class DungeonCommand {
+public class DungeonCommand extends CommandBase {
     private final Map<String, SubCommand> subCommands;
+    private final ConfigManager configManager;
+    private final DungeonManager dungeonManager;
+    private final PortalManager portalManager;
+    private final ShardManager shardManager;
     
     public DungeonCommand(ConfigManager configManager, DungeonManager dungeonManager,
-                         PortalManager portalManager, ShardManager shardManager) {
+                          PortalManager portalManager, ShardManager shardManager) {
+        super("dungeon", "Main dungeon management command", true); // true = requires OP
+        
+        this.configManager = configManager;
+        this.dungeonManager = dungeonManager;
+        this.portalManager = portalManager;
+        this.shardManager = shardManager;
         this.subCommands = new HashMap<>();
         
         // Register all subcommands
@@ -35,7 +50,7 @@ public class DungeonCommand {
         registerSubCommand(new RoomSubCommand(configManager));
         registerSubCommand(new SpawnSubCommand(configManager));
         registerSubCommand(new BossSubCommand(configManager));
-        registerSubCommand(new GenerateSubCommand(configManager)); // NEW
+        registerSubCommand(new GenerateSubCommand(configManager));
     }
     
     /**

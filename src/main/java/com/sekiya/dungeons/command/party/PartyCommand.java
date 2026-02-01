@@ -382,8 +382,8 @@ class InfoPartyCommand implements SubPartyCommand {
         player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
         player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&6&lParty Info"));
         player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
-        MessageUtil.sendMessage(sender, "&7Leader: &f" + party.getLeaderName());
-        MessageUtil.sendMessage(sender, String.format("&7Members: &f%d/%d", party.getSize(), party.getMaxSize()));
+        MessageUtil.sendMessage(player, "&7Leader: &f" + party.getLeaderName());
+        MessageUtil.sendMessage(player, String.format("&7Members: &f%d/%d", party.getSize(), party.getMaxSize()));
         player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&7Party Members:"));
         
         for (String member : party.getMembers()) {
@@ -431,7 +431,7 @@ class ListPartyCommand implements SubPartyCommand {
         player.sendMessage(com.hypixel.hytale.server.util.Message.raw("&8&m-----------------------"));
         
         for (Party party : parties) {
-            MessageUtil.sendMessage(sender, String.format("&e%s's party &7- &f%d/%d members", 
+            MessageUtil.sendMessage(player, String.format("&e%s's party &7- &f%d/%d members", 
                 party.getLeaderName(), party.getSize(), party.getMaxSize()));
         }
         

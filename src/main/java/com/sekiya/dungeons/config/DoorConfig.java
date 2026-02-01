@@ -24,4 +24,18 @@ public class DoorConfig {
     
     public int getWidth() { return size != null ? size.getOrDefault("width", 1) : 1; }
     public int getHeight() { return size != null ? size.getOrDefault("height", 3) : 3; }
+    
+    public void setWidth(int width) {
+        if (size == null) {
+            size = new java.util.HashMap<>();
+        }
+        size.put("width", width);
+    }
+    
+    public void setHeight(int height) {
+        if (size == null) {
+            size = new java.util.HashMap<>();
+        }
+        size.put("height", height);
+    }
 }
