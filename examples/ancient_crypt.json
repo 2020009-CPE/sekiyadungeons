@@ -1,0 +1,226 @@
+{
+  "name": "ancient_crypt",
+  "displayName": "Ancient Crypt",
+  "portalLocation": {
+    "world": "world",
+    "x": 100,
+    "y": 64,
+    "z": 200
+  },
+  "entryPoint": {
+    "world": "dungeon_world",
+    "x": 0,
+    "y": 64,
+    "z": 0
+  },
+  "exitPoint": {
+    "world": "world",
+    "x": 100,
+    "y": 64,
+    "z": 202
+  },
+  "shardType": "ancient_crypt_shard",
+  "shardConsumed": true,
+  "minPlayers": 1,
+  "maxPlayers": 4,
+  "timeLimit": 1800,
+  "rooms": [
+    {
+      "id": "entrance_hall",
+      "order": 1,
+      "bounds": {
+        "min": {
+          "world": "dungeon_world",
+          "x": 0,
+          "y": 60,
+          "z": 0
+        },
+        "max": {
+          "world": "dungeon_world",
+          "x": 20,
+          "y": 75,
+          "z": 20
+        }
+      },
+      "door": {
+        "type": "BLOCK_BARRIER",
+        "location": {
+          "world": "dungeon_world",
+          "x": 20,
+          "y": 64,
+          "z": 10
+        },
+        "size": {
+          "width": 3,
+          "height": 3
+        }
+      },
+      "spawnPoints": [
+        {
+          "id": "spawn_1",
+          "location": {
+            "world": "dungeon_world",
+            "x": 5,
+            "y": 64,
+            "z": 5
+          },
+          "enemyType": "skeleton",
+          "count": 3
+        },
+        {
+          "id": "spawn_2",
+          "location": {
+            "world": "dungeon_world",
+            "x": 15,
+            "y": 64,
+            "z": 15
+          },
+          "enemyType": "zombie",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "treasure_chamber",
+      "order": 2,
+      "bounds": {
+        "min": {
+          "world": "dungeon_world",
+          "x": 20,
+          "y": 60,
+          "z": 0
+        },
+        "max": {
+          "world": "dungeon_world",
+          "x": 40,
+          "y": 75,
+          "z": 20
+        }
+      },
+      "door": {
+        "type": "BLOCK_BARRIER",
+        "location": {
+          "world": "dungeon_world",
+          "x": 40,
+          "y": 64,
+          "z": 10
+        },
+        "size": {
+          "width": 3,
+          "height": 3
+        }
+      },
+      "spawnPoints": [
+        {
+          "id": "spawn_1",
+          "location": {
+            "world": "dungeon_world",
+            "x": 25,
+            "y": 64,
+            "z": 10
+          },
+          "enemyType": "skeleton",
+          "count": 4
+        },
+        {
+          "id": "spawn_2",
+          "location": {
+            "world": "dungeon_world",
+            "x": 35,
+            "y": 64,
+            "z": 10
+          },
+          "enemyType": "creeper",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "ritual_room",
+      "order": 3,
+      "bounds": {
+        "min": {
+          "world": "dungeon_world",
+          "x": 40,
+          "y": 60,
+          "z": 0
+        },
+        "max": {
+          "world": "dungeon_world",
+          "x": 60,
+          "y": 75,
+          "z": 20
+        }
+      },
+      "door": {
+        "type": "BLOCK_BARRIER",
+        "location": {
+          "world": "dungeon_world",
+          "x": 60,
+          "y": 64,
+          "z": 10
+        },
+        "size": {
+          "width": 3,
+          "height": 3
+        }
+      },
+      "spawnPoints": [
+        {
+          "id": "spawn_1",
+          "location": {
+            "world": "dungeon_world",
+            "x": 50,
+            "y": 64,
+            "z": 10
+          },
+          "enemyType": "witch",
+          "count": 3
+        }
+      ]
+    }
+  ],
+  "bossRoom": {
+    "id": "boss_chamber",
+    "bounds": {
+      "min": {
+        "world": "dungeon_world",
+        "x": 60,
+        "y": 60,
+        "z": 0
+      },
+      "max": {
+        "world": "dungeon_world",
+        "x": 90,
+        "y": 80,
+        "z": 30
+      }
+    },
+    "bossType": "crypt_guardian",
+    "bossSpawnPoint": {
+      "world": "dungeon_world",
+      "x": 75,
+      "y": 64,
+      "z": 15
+    },
+    "spawnOnEntry": true
+  },
+  "completionCountdown": 30,
+  "rewards": [
+    {
+      "type": "item",
+      "itemId": "diamond",
+      "amount": 5
+    },
+    {
+      "type": "item",
+      "itemId": "emerald",
+      "amount": 3
+    },
+    {
+      "type": "experience",
+      "itemId": "xp",
+      "amount": 1000
+    }
+  ]
+}

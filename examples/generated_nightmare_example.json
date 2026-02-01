@@ -1,0 +1,223 @@
+{
+  "name": "generated_nightmare_dungeon",
+  "displayName": "Generated Nightmare Dungeon",
+  "portalLocation": {
+    "world": "world",
+    "x": 0.0,
+    "y": 64.0,
+    "z": 0.0
+  },
+  "entryPoint": {
+    "world": "dungeon_generated_nightmare_dungeon",
+    "x": 0.0,
+    "y": 64.0,
+    "z": 0.0
+  },
+  "exitPoint": {
+    "world": "world",
+    "x": 0.0,
+    "y": 64.0,
+    "z": 5.0
+  },
+  "shardType": "generated_nightmare_dungeon_shard",
+  "shardConsumed": true,
+  "minPlayers": 3,
+  "maxPlayers": 4,
+  "timeLimit": 900,
+  "difficulty": "NIGHTMARE",
+  "requiresParty": true,
+  "requiredPartySize": 3,
+  "minLevel": 0,
+  "requiredItems": [],
+  "cooldownMillis": 0,
+  "scalingEnabled": true,
+  "healthScalingPerPlayer": 0.3,
+  "damageScalingPerPlayer": 0.2,
+  "maxLives": 0,
+  "hasCheckpoints": false,
+  "bonusObjectives": [],
+  "timeAttackMode": false,
+  "timeAttackBonusSeconds": 0,
+  "rooms": [
+    {
+      "id": "room_1",
+      "order": 1,
+      "bounds": {
+        "min": {
+          "world": "dungeon",
+          "x": 0.0,
+          "y": 60.0,
+          "z": 0.0
+        },
+        "max": {
+          "world": "dungeon",
+          "x": 24.0,
+          "y": 75.0,
+          "z": 27.0
+        }
+      },
+      "door": {
+        "type": "BLOCK_BARRIER",
+        "location": {
+          "world": "dungeon",
+          "x": 24.0,
+          "y": 64.0,
+          "z": 13.0
+        },
+        "size": {
+          "width": 3,
+          "height": 3
+        }
+      },
+      "spawnPoints": [
+        {
+          "id": "spawn_1",
+          "location": {
+            "world": "dungeon",
+            "x": 4.0,
+            "y": 64.0,
+            "z": 13.0
+          },
+          "enemyType": "witch",
+          "count": 4
+        },
+        {
+          "id": "spawn_2",
+          "location": {
+            "world": "dungeon",
+            "x": 15.0,
+            "y": 64.0,
+            "z": 5.0
+          },
+          "enemyType": "creeper",
+          "count": 4
+        },
+        {
+          "id": "spawn_3",
+          "location": {
+            "world": "dungeon",
+            "x": 8.0,
+            "y": 64.0,
+            "z": 22.0
+          },
+          "enemyType": "skeleton",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "room_2",
+      "order": 2,
+      "bounds": {
+        "min": {
+          "world": "dungeon",
+          "x": 29.0,
+          "y": 60.0,
+          "z": 0.0
+        },
+        "max": {
+          "world": "dungeon",
+          "x": 46.0,
+          "y": 71.0,
+          "z": 18.0
+        }
+      },
+      "door": {
+        "type": "BLOCK_BARRIER",
+        "location": {
+          "world": "dungeon",
+          "x": 46.0,
+          "y": 64.0,
+          "z": 9.0
+        },
+        "size": {
+          "width": 3,
+          "height": 3
+        }
+      },
+      "spawnPoints": [
+        {
+          "id": "spawn_1",
+          "location": {
+            "world": "dungeon",
+            "x": 38.0,
+            "y": 64.0,
+            "z": 11.0
+          },
+          "enemyType": "zombie",
+          "count": 4
+        },
+        {
+          "id": "spawn_2",
+          "location": {
+            "world": "dungeon",
+            "x": 33.0,
+            "y": 64.0,
+            "z": 3.0
+          },
+          "enemyType": "spider",
+          "count": 4
+        },
+        {
+          "id": "spawn_3",
+          "location": {
+            "world": "dungeon",
+            "x": 41.0,
+            "y": 64.0,
+            "z": 16.0
+          },
+          "enemyType": "witch",
+          "count": 3
+        }
+      ]
+    }
+  ],
+  "bossRoom": {
+    "id": "boss_room",
+    "bounds": {
+      "min": {
+        "world": "dungeon",
+        "x": 51.0,
+        "y": 60.0,
+        "z": 0.0
+      },
+      "max": {
+        "world": "dungeon",
+        "x": 91.0,
+        "y": 85.0,
+        "z": 40.0
+      }
+    },
+    "bossType": "shadow_beast",
+    "bossSpawnPoint": {
+      "world": "dungeon",
+      "x": 71.0,
+      "y": 64.0,
+      "z": 20.0
+    },
+    "spawnOnEntry": true
+  },
+  "completionCountdown": 15,
+  "rewards": [
+    {
+      "type": "item",
+      "itemId": "gold_ingot",
+      "amount": 4
+    },
+    {
+      "type": "item",
+      "itemId": "enchanted_book",
+      "amount": 1
+    },
+    {
+      "type": "item",
+      "itemId": "rare_artifact",
+      "amount": 3
+    },
+    {
+      "type": "experience",
+      "itemId": "xp",
+      "amount": 1257
+    }
+  ]
+}
