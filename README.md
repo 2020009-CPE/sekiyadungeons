@@ -1,6 +1,6 @@
 # SekiyaDungeons
 
-A comprehensive dungeon system plugin for Hytale featuring portals, shards, room-based progression, boss encounters, and automatic reset mechanics.
+A comprehensive dungeon system plugin for Hytale featuring portals, shards, room-based progression, boss encounters, automatic reset mechanics, **party system**, and **auto-generated dungeons**.
 
 ## Features
 
@@ -15,6 +15,32 @@ A comprehensive dungeon system plugin for Hytale featuring portals, shards, room
 - **Auto-Reset** - Automatic dungeon restoration after completion
 - **Configuration** - JSON-based dungeon templates with easy editing
 
+### 🎉 NEW: Party System
+- **Party Creation** - Create and manage parties of up to 8 players
+- **Party Invitations** - Invite players with time-limited invitations
+- **Party-Based Entry** - Enter dungeons together as a party
+- **Party Commands** - Full command suite for party management
+- **Party Requirements** - Dungeons can require specific party sizes
+
+### 🎉 NEW: Auto-Generated Dungeons
+- **Procedural Generation** - Automatically generate complete dungeons
+- **Seed-Based** - Reproducible dungeons with custom seeds
+- **Difficulty Scaling** - Generate dungeons at Easy, Normal, Hard, or Nightmare difficulty
+- **Random Layouts** - Variable room count, sizes, and connections
+- **Random Enemies** - Procedurally placed spawn points with varied enemy types
+- **Random Loot** - Automatically generated reward tables
+
+### 🎉 NEW: Enhanced Features
+- **Difficulty Tiers** - Four difficulty levels with different requirements
+- **Party Requirements** - Require minimum party size for entry
+- **Level Requirements** - Set minimum player levels
+- **Cooldown System** - Per-player dungeon cooldowns
+- **Scaling System** - Enemy health/damage scales with party size
+- **Lives System** - Optional limited lives per run
+- **Checkpoints** - Save progress at key points
+- **Bonus Objectives** - Optional challenges for extra rewards
+- **Time Attack Mode** - Complete dungeons faster for bonuses
+
 ### Admin Tools
 - Full command system for dungeon creation and management
 - In-game configuration of portals, rooms, spawns, and bosses
@@ -24,6 +50,8 @@ A comprehensive dungeon system plugin for Hytale featuring portals, shards, room
 ### API
 - Public API for other plugins to interact with dungeons
 - Custom events for dungeon lifecycle (start, complete, room clear, boss defeat)
+- Party events (create, join, leave, disband)
+- Generation events for procedural dungeons
 - Instance and player tracking methods
 
 ## Installation
@@ -35,7 +63,36 @@ A comprehensive dungeon system plugin for Hytale featuring portals, shards, room
 
 ## Quick Start
 
-### Creating Your First Dungeon
+### Option 1: Auto-Generate a Dungeon (NEW!)
+
+The fastest way to create a dungeon:
+
+```bash
+# Generate a dungeon with default settings
+/dungeon generate my_dungeon
+
+# Generate with specific difficulty
+/dungeon generate hard_dungeon HARD
+
+# Generate with a custom seed for reproducibility
+/dungeon generate seeded_dungeon NORMAL 12345
+```
+
+This creates a complete dungeon with:
+- 3-6 random rooms (varies by difficulty)
+- Random enemy spawns
+- Random boss selection
+- Random loot rewards
+- Proper room connections and doors
+
+Then just set the portal location:
+```bash
+/dungeon setportal my_dungeon
+/dungeon setentry my_dungeon
+/dungeon setexit my_dungeon
+```
+
+### Option 2: Manual Creation
 
 1. **Create the dungeon template:**
    ```
@@ -82,17 +139,61 @@ A comprehensive dungeon system plugin for Hytale featuring portals, shards, room
    /dungeon give shard <your_name> my_first_dungeon 1
    ```
 
+### Using the Party System
+
+```bash
+# Create a party
+/party create
+
+# Invite players
+/party invite PlayerName
+
+# Player accepts invitation
+/party join LeaderName
+
+# View party info
+/party info
+
+# Leave party
+/party leave
+
+# Kick a member (leader only)
+/party kick PlayerName
+
+# Disband party (leader only)
+/party disband
+
+# List all active parties
+/party list
+```
+
+When entering a dungeon portal, **all party members near the portal will enter together** automatically!
+
 ## Commands
 
-### Main Commands
+### Dungeon Commands
 
 | Command | Description | Permission |
 |---------|-------------|------------|
 | `/dungeon create <name>` | Create new dungeon template | `sekiyadungeons.command.create` |
+| `/dungeon generate <name> [difficulty] [seed]` | **NEW** Generate random dungeon | `sekiyadungeons.command.generate` |
 | `/dungeon delete <name>` | Delete dungeon template | `sekiyadungeons.command.delete` |
 | `/dungeon list` | List all dungeons | `sekiyadungeons.command.list` |
 | `/dungeon info <name>` | Show dungeon details | `sekiyadungeons.command.info` |
 | `/dungeon reload` | Reload configurations | `sekiyadungeons.command.reload` |
+
+### Party Commands (NEW!)
+
+| Command | Description | Permission |
+|---------|-------------|------------|
+| `/party create` | Create a new party | `sekiyadungeons.party.create` |
+| `/party invite <player>` | Invite a player to your party | `sekiyadungeons.party.invite` |
+| `/party join <leader>` | Join a party you were invited to | `sekiyadungeons.party.join` |
+| `/party leave` | Leave your current party | `sekiyadungeons.party.leave` |
+| `/party kick <player>` | Kick a player (leader only) | `sekiyadungeons.party.kick` |
+| `/party disband` | Disband your party (leader only) | `sekiyadungeons.party.disband` |
+| `/party info` | Show your party information | `sekiyadungeons.party.info` |
+| `/party list` | List all active parties | `sekiyadungeons.party.list` |
 
 ### Configuration Commands
 
@@ -164,6 +265,7 @@ Dungeon templates are stored in `plugins/SekiyaDungeons/dungeons/`. See `example
 
 **Key Configuration Fields:**
 
+**Basic Settings:**
 - `name` - Unique dungeon identifier
 - `displayName` - Friendly display name
 - `portalLocation` - Where the portal spawns in the overworld
@@ -173,10 +275,59 @@ Dungeon templates are stored in `plugins/SekiyaDungeons/dungeons/`. See `example
 - `shardConsumed` - Whether shard is used up on entry
 - `minPlayers` / `maxPlayers` - Player count limits
 - `timeLimit` - Maximum dungeon duration in seconds
+- `completionCountdown` - Seconds before teleport after boss defeat
+
+**🎉 NEW Enhanced Settings:**
+- `difficulty` - Difficulty level: "EASY", "NORMAL", "HARD", or "NIGHTMARE"
+- `requiresParty` - Whether dungeon requires players to be in a party
+- `requiredPartySize` - Minimum party size to enter (0 = any size)
+- `minLevel` - Minimum player level required
+- `requiredItems` - Array of item IDs required in inventory
+- `cooldownMillis` - Per-player cooldown between runs (in milliseconds)
+- `scalingEnabled` - Whether enemy stats scale with party size
+- `healthScalingPerPlayer` - Health multiplier per additional player (e.g., 0.3 = +30%)
+- `damageScalingPerPlayer` - Damage multiplier per additional player (e.g., 0.2 = +20%)
+- `maxLives` - Maximum deaths allowed (0 = unlimited)
+- `hasCheckpoints` - Whether dungeon has checkpoint save points
+- `bonusObjectives` - Array of optional bonus challenge IDs
+- `timeAttackMode` - Whether dungeon has time attack bonuses
+- `timeAttackBonusSeconds` - Time limit for bonus rewards
+
+**Room and Boss Configuration:**
 - `rooms[]` - Array of dungeon rooms with spawn points
 - `bossRoom` - Boss configuration
-- `completionCountdown` - Seconds before teleport after boss defeat
 - `rewards[]` - Items/XP given on completion
+
+### Example Enhanced Configuration
+
+```json
+{
+  "name": "nightmare_fortress",
+  "displayName": "Nightmare Fortress",
+  "difficulty": "NIGHTMARE",
+  "requiresParty": true,
+  "requiredPartySize": 3,
+  "minLevel": 50,
+  "cooldownMillis": 3600000,
+  "scalingEnabled": true,
+  "healthScalingPerPlayer": 0.4,
+  "damageScalingPerPlayer": 0.25,
+  "maxLives": 3,
+  "timeAttackMode": true,
+  "timeAttackBonusSeconds": 600,
+  "minPlayers": 3,
+  "maxPlayers": 4,
+  "timeLimit": 900
+}
+```
+
+This creates a challenging dungeon that:
+- Requires a party of 3+ players
+- Requires player level 50+
+- Has a 1-hour cooldown per player
+- Scales enemy stats by 40% health and 25% damage per player
+- Allows only 3 deaths before failure
+- Grants bonus rewards if completed in under 10 minutes
 
 ## Dungeon Flow
 
@@ -247,6 +398,51 @@ Listen to dungeon events in your plugin:
 // DungeonStartEvent - fired when dungeon starts
 // DungeonCompleteEvent - fired when dungeon completes  
 // RoomClearEvent - fired when room is cleared
+// BossDefeatEvent - fired when boss is defeated
+
+// 🎉 NEW Party Events
+// PartyCreateEvent - fired when party is created
+// PartyJoinEvent - fired when player joins party
+
+// 🎉 NEW Generation Event
+// DungeonGenerateEvent - fired when dungeon is auto-generated
+```
+
+### Party API
+
+```java
+// Get the party manager
+PartyManager partyManager = plugin.getPartyManager();
+
+// Check if player is in a party
+boolean inParty = partyManager.isInParty(playerName);
+
+// Get player's party
+Party party = partyManager.getPlayerParty(playerName);
+
+// Get party details
+if (party != null) {
+    String leader = party.getLeaderName();
+    Set<String> members = party.getMembers();
+    int size = party.getSize();
+    boolean isFull = party.isFull();
+}
+```
+
+### Generator API
+
+```java
+// Generate a dungeon programmatically
+DungeonGenerator generator = new DungeonGenerator();
+GenerationConfig config = new GenerationConfig();
+config.setDifficulty("HARD");
+config.setSeed(12345);
+config.setMinRooms(5);
+config.setMaxRooms(8);
+
+DungeonTemplate template = generator.generate("my_dungeon", config);
+configManager.saveDungeonTemplate(template);
+```
 // BossDefeatEvent - fired when boss is defeated
 ```
 
