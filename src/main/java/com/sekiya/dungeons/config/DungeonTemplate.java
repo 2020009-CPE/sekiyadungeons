@@ -23,6 +23,22 @@ public class DungeonTemplate {
     private int completionCountdown;
     private List<RewardConfig> rewards;
     
+    // Enhanced features
+    private String difficulty; // EASY, NORMAL, HARD, NIGHTMARE
+    private boolean requiresParty;
+    private int requiredPartySize;
+    private int minLevel;
+    private List<String> requiredItems;
+    private long cooldownMillis;
+    private boolean scalingEnabled;
+    private double healthScalingPerPlayer;
+    private double damageScalingPerPlayer;
+    private int maxLives;
+    private boolean hasCheckpoints;
+    private List<String> bonusObjectives;
+    private boolean timeAttackMode;
+    private int timeAttackBonusSeconds;
+    
     public DungeonTemplate() {
         this.rooms = new ArrayList<>();
         this.rewards = new ArrayList<>();
@@ -31,6 +47,22 @@ public class DungeonTemplate {
         this.timeLimit = 1800;
         this.completionCountdown = 30;
         this.shardConsumed = true;
+        
+        // Enhanced defaults
+        this.difficulty = "NORMAL";
+        this.requiresParty = false;
+        this.requiredPartySize = 0;
+        this.minLevel = 0;
+        this.requiredItems = new ArrayList<>();
+        this.cooldownMillis = 0;
+        this.scalingEnabled = true;
+        this.healthScalingPerPlayer = 0.3; // 30% more health per player
+        this.damageScalingPerPlayer = 0.2; // 20% more damage per player
+        this.maxLives = 0; // 0 = unlimited
+        this.hasCheckpoints = false;
+        this.bonusObjectives = new ArrayList<>();
+        this.timeAttackMode = false;
+        this.timeAttackBonusSeconds = 0;
     }
     
     public String getName() { return name; }
@@ -74,4 +106,53 @@ public class DungeonTemplate {
     
     public List<RewardConfig> getRewards() { return rewards; }
     public void setRewards(List<RewardConfig> rewards) { this.rewards = rewards; }
+    
+    // Enhanced getters and setters
+    public String getDifficulty() { return difficulty; }
+    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+    
+    public boolean isRequiresParty() { return requiresParty; }
+    public void setRequiresParty(boolean requiresParty) { this.requiresParty = requiresParty; }
+    
+    public int getRequiredPartySize() { return requiredPartySize; }
+    public void setRequiredPartySize(int requiredPartySize) { this.requiredPartySize = requiredPartySize; }
+    
+    public int getMinLevel() { return minLevel; }
+    public void setMinLevel(int minLevel) { this.minLevel = minLevel; }
+    
+    public List<String> getRequiredItems() { return requiredItems; }
+    public void setRequiredItems(List<String> requiredItems) { this.requiredItems = requiredItems; }
+    
+    public long getCooldownMillis() { return cooldownMillis; }
+    public void setCooldownMillis(long cooldownMillis) { this.cooldownMillis = cooldownMillis; }
+    
+    public boolean isScalingEnabled() { return scalingEnabled; }
+    public void setScalingEnabled(boolean scalingEnabled) { this.scalingEnabled = scalingEnabled; }
+    
+    public double getHealthScalingPerPlayer() { return healthScalingPerPlayer; }
+    public void setHealthScalingPerPlayer(double healthScalingPerPlayer) { 
+        this.healthScalingPerPlayer = healthScalingPerPlayer; 
+    }
+    
+    public double getDamageScalingPerPlayer() { return damageScalingPerPlayer; }
+    public void setDamageScalingPerPlayer(double damageScalingPerPlayer) { 
+        this.damageScalingPerPlayer = damageScalingPerPlayer; 
+    }
+    
+    public int getMaxLives() { return maxLives; }
+    public void setMaxLives(int maxLives) { this.maxLives = maxLives; }
+    
+    public boolean isHasCheckpoints() { return hasCheckpoints; }
+    public void setHasCheckpoints(boolean hasCheckpoints) { this.hasCheckpoints = hasCheckpoints; }
+    
+    public List<String> getBonusObjectives() { return bonusObjectives; }
+    public void setBonusObjectives(List<String> bonusObjectives) { this.bonusObjectives = bonusObjectives; }
+    
+    public boolean isTimeAttackMode() { return timeAttackMode; }
+    public void setTimeAttackMode(boolean timeAttackMode) { this.timeAttackMode = timeAttackMode; }
+    
+    public int getTimeAttackBonusSeconds() { return timeAttackBonusSeconds; }
+    public void setTimeAttackBonusSeconds(int timeAttackBonusSeconds) { 
+        this.timeAttackBonusSeconds = timeAttackBonusSeconds; 
+    }
 }

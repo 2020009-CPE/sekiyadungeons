@@ -35,6 +35,7 @@ public class DungeonCommand {
         registerSubCommand(new RoomSubCommand(configManager));
         registerSubCommand(new SpawnSubCommand(configManager));
         registerSubCommand(new BossSubCommand(configManager));
+        registerSubCommand(new GenerateSubCommand(configManager)); // NEW
     }
     
     /**

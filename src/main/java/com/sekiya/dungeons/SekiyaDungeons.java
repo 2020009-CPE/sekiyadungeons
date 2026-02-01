@@ -2,10 +2,12 @@ package com.sekiya.dungeons;
 
 import com.sekiya.dungeons.api.DungeonAPI;
 import com.sekiya.dungeons.command.DungeonCommand;
+import com.sekiya.dungeons.command.party.PartyCommand;
 import com.sekiya.dungeons.completion.CompletionHandler;
 import com.sekiya.dungeons.config.ConfigManager;
 import com.sekiya.dungeons.instance.DungeonManager;
 import com.sekiya.dungeons.listener.*;
+import com.sekiya.dungeons.party.PartyManager;
 import com.sekiya.dungeons.portal.PortalManager;
 import com.sekiya.dungeons.reset.DungeonResetter;
 import com.sekiya.dungeons.shard.ShardManager;
@@ -28,6 +30,7 @@ public class SekiyaDungeons {
     private DungeonManager dungeonManager;
     private PortalManager portalManager;
     private ShardManager shardManager;
+    private PartyManager partyManager;
     private DungeonResetter resetter;
     private CompletionHandler completionHandler;
     
@@ -39,6 +42,7 @@ public class SekiyaDungeons {
     
     // Commands
     private DungeonCommand dungeonCommand;
+    private PartyCommand partyCommand;
     
     // API
     private DungeonAPI api;
@@ -104,6 +108,7 @@ public class SekiyaDungeons {
         this.dungeonManager = new DungeonManager(configManager);
         this.portalManager = new PortalManager();
         this.shardManager = new ShardManager();
+        this.partyManager = new PartyManager();
         this.resetter = new DungeonResetter();
         this.completionHandler = new CompletionHandler(dungeonManager, portalManager, resetter);
     }
@@ -127,9 +132,11 @@ public class SekiyaDungeons {
      */
     private void registerCommands() {
         this.dungeonCommand = new DungeonCommand(configManager, dungeonManager, portalManager, shardManager);
+        this.partyCommand = new PartyCommand(partyManager);
         
         // In actual Hytale plugin, register with command manager
         // Example: commandManager.registerCommand("dungeon", dungeonCommand);
+        // Example: commandManager.registerCommand("party", partyCommand);
         System.out.println("[SekiyaDungeons] Registered commands");
     }
     
@@ -204,6 +211,13 @@ public class SekiyaDungeons {
      */
     public ShardManager getShardManager() {
         return shardManager;
+    }
+    
+    /**
+     * Gets the party manager
+     */
+    public PartyManager getPartyManager() {
+        return partyManager;
     }
     
     /**
